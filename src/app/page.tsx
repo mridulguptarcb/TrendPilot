@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { TrendDiscovery } from "@/components/TrendDiscovery";
 import { RAGEvidenceViewer } from "@/components/RAGEvidenceViewer";
 import { ContentStudio } from "@/components/ContentStudio";
+import { ContextEngine } from "@/components/ContextEngine";
 import { PublishingQueue } from "@/components/PublishingQueue";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { SwytchcodeAuditModal } from "@/components/SwytchcodeAuditModal";
@@ -18,7 +19,7 @@ import { FALLBACK_TRENDS } from "@/lib/trends";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<
-    "trends" | "rag" | "studio" | "queue" | "analytics"
+    "trends" | "rag" | "studio" | "context" | "queue" | "analytics"
   >("trends");
 
   // App Data States
@@ -256,6 +257,10 @@ export default function Home() {
             onRefresh={fetchTrends}
             onSelectTrend={handleSelectTrend}
             selectedTrendId={selectedTrend?.id}
+            onRepurposeInContextEngine={(trend) => {
+              setSelectedTrend(trend);
+              setActiveTab("context");
+            }}
           />
         )}
 
@@ -266,6 +271,7 @@ export default function Home() {
             isLoading={isLoadingRAG}
             onRunCustomQuery={handleCustomRAGQuery}
             onProceedToStudio={handleProceedToStudio}
+            onProceedToContextEngine={() => setActiveTab("context")}
           />
         )}
 
@@ -275,6 +281,17 @@ export default function Home() {
             isLoading={isLoadingGen}
             onRegenerate={handleRegenerate}
             onSchedulePost={handleSchedulePost}
+            onOpenContextEngine={() => setActiveTab("context")}
+          />
+        )}
+
+        {activeTab === "context" && (
+          <ContextEngine
+            initialTrend={selectedTrend}
+            initialRagContext={ragContext}
+            trends={trends}
+            onSchedulePost={handleSchedulePost}
+            onNavigateToTab={(tab) => setActiveTab(tab)}
           />
         )}
 

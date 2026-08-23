@@ -10,6 +10,7 @@ interface RAGEvidenceViewerProps {
   isLoading: boolean;
   onRunCustomQuery: (query: string) => void;
   onProceedToStudio: () => void;
+  onProceedToContextEngine?: () => void;
 }
 
 export const RAGEvidenceViewer: React.FC<RAGEvidenceViewerProps> = ({
@@ -18,6 +19,7 @@ export const RAGEvidenceViewer: React.FC<RAGEvidenceViewerProps> = ({
   isLoading,
   onRunCustomQuery,
   onProceedToStudio,
+  onProceedToContextEngine,
 }) => {
   const [customQuery, setCustomQuery] = useState("");
 
@@ -208,15 +210,28 @@ export const RAGEvidenceViewer: React.FC<RAGEvidenceViewerProps> = ({
               Gemini LLM will synthesize these exact verified evidence chunks into platform-tailored drafts with direct source citations.
             </div>
 
-            <button
-              onClick={onProceedToStudio}
-              disabled={isLoading || !ragContext}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 py-3 text-xs font-bold text-white shadow-lg shadow-orange-500/25 transition-all active:scale-95 disabled:opacity-50"
-            >
-              <Sparkles className="h-4 w-4" />
-              Generate Multi-Platform Content
-              <ArrowRight className="h-4 w-4" />
-            </button>
+            <div className="space-y-2 pt-2">
+              <button
+                onClick={onProceedToStudio}
+                disabled={isLoading || !ragContext}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 py-2.5 text-xs font-bold text-white shadow-lg shadow-orange-500/25 transition-all active:scale-95 disabled:opacity-50"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Multi-Platform Content
+                <ArrowRight className="h-4 w-4" />
+              </button>
+
+              {onProceedToContextEngine && (
+                <button
+                  onClick={onProceedToContextEngine}
+                  disabled={isLoading || !ragContext}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-orange-500/40 bg-orange-500/15 hover:bg-orange-500/25 py-2.5 text-xs font-bold text-orange-300 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <Sparkles className="h-4 w-4 text-orange-400" />
+                  Repurpose in Context Engine (1→Many)
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

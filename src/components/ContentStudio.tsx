@@ -26,6 +26,7 @@ interface ContentStudioProps {
     tone: GeneratedContent["tone"]
   ) => void;
   onSchedulePost: (post: Omit<ScheduledPost, "id">) => void;
+  onOpenContextEngine?: () => void;
 }
 
 export const ContentStudio: React.FC<ContentStudioProps> = ({
@@ -33,6 +34,7 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({
   isLoading,
   onRegenerate,
   onSchedulePost,
+  onOpenContextEngine,
 }) => {
   const [activePlatform, setActivePlatform] = useState<PlatformType>("twitter");
   const [selectedAudience, setSelectedAudience] = useState<GeneratedContent["audience"]>(
@@ -181,6 +183,16 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({
                 <Linkedin className="h-4 w-4 text-blue-400" />
                 <span>1-Click Post to LinkedIn (Free)</span>
                 <ExternalLink className="h-3 w-3" />
+              </button>
+            )}
+
+            {onOpenContextEngine && (
+              <button
+                onClick={onOpenContextEngine}
+                className="flex items-center gap-1.5 rounded-xl border border-orange-500/40 bg-orange-500/20 px-3.5 py-2 text-xs font-semibold text-orange-300 hover:bg-orange-500/30 transition-all shadow-sm"
+              >
+                <Zap className="h-4 w-4 text-orange-400" />
+                <span>Repurpose (Context Engine)</span>
               </button>
             )}
 

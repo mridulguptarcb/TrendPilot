@@ -4,8 +4,8 @@ import React from "react";
 import { Zap, ShieldCheck, Flame, Database, Send, BarChart3, Activity } from "lucide-react";
 
 interface HeaderProps {
-  activeTab: "trends" | "rag" | "studio" | "queue" | "analytics";
-  setActiveTab: (tab: "trends" | "rag" | "studio" | "queue" | "analytics") => void;
+  activeTab: "trends" | "rag" | "studio" | "context" | "queue" | "analytics";
+  setActiveTab: (tab: "trends" | "rag" | "studio" | "context" | "queue" | "analytics") => void;
   onOpenAudit: () => void;
   pendingPublishCount: number;
 }
@@ -36,10 +36,10 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900/60 p-1">
+        <nav className="hidden lg:flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900/60 p-1">
           <button
             onClick={() => setActiveTab("trends")}
-            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
               activeTab === "trends"
                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("rag")}
-            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
               activeTab === "rag"
                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("studio")}
-            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
               activeTab === "studio"
                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
@@ -71,15 +71,27 @@ export const Header: React.FC<HeaderProps> = ({
             3. Content Studio
           </button>
           <button
+            onClick={() => setActiveTab("context")}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+              activeTab === "context"
+                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/30"
+                : "text-orange-400 hover:text-white hover:bg-orange-500/10"
+            }`}
+          >
+            <Zap className="h-3.5 w-3.5 text-orange-400 animate-pulse" />
+            <span>4. Context Engine</span>
+            <span className="rounded bg-orange-400/20 text-orange-300 text-[9px] px-1 py-0.2 font-bold">1→Many</span>
+          </button>
+          <button
             onClick={() => setActiveTab("queue")}
-            className={`relative flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+            className={`relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
               activeTab === "queue"
                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
             <Send className="h-3.5 w-3.5" />
-            4. Publish Queue
+            5. Publish Queue
             {pendingPublishCount > 0 && (
               <span className="ml-1 rounded-full bg-rose-500 px-1.5 py-0.2 text-[10px] font-bold text-white">
                 {pendingPublishCount}
@@ -88,14 +100,14 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => setActiveTab("analytics")}
-            className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
               activeTab === "analytics"
                 ? "bg-orange-500 text-white shadow-md shadow-orange-500/30"
                 : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50"
             }`}
           >
             <BarChart3 className="h-3.5 w-3.5" />
-            5. Analytics
+            6. Analytics
           </button>
         </nav>
 

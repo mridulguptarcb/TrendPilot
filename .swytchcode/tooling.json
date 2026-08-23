@@ -1,7 +1,52 @@
 {
   "editor": "gemini",
-  "integrations": {},
+  "integrations": {
+    "gemini": {
+      "provider": "google",
+      "model": "gemini-2.5-flash",
+      "type": "llm"
+    },
+    "rss": {
+      "provider": "multi-source",
+      "sources": ["hackernews", "techcrunch", "devto", "arxiv", "github"],
+      "type": "retriever"
+    },
+    "context_engine": {
+      "provider": "trendforge",
+      "pipeline": "blueprint-to-multiformat",
+      "type": "repurposing"
+    }
+  },
   "mode": "production",
-  "tools": {},
+  "tools": {
+    "rss.trends.fetch": {
+      "description": "Fetch and parse real-time trends across tech platforms",
+      "authority": "enforced"
+    },
+    "rag.vector.retrieve": {
+      "description": "Chunk text and retrieve vector cosine similarity evidence",
+      "authority": "enforced"
+    },
+    "gemini.generate_content": {
+      "description": "Generate grounded multi-channel drafts using Google Gemini",
+      "authority": "enforced"
+    },
+    "context_engine.blueprint.create": {
+      "description": "Normalize multi-source input into a shared structured Content Blueprint",
+      "authority": "enforced"
+    },
+    "context_engine.formats.repurpose": {
+      "description": "Transform shared blueprint into Video, Thread, Caption, and Blog formats",
+      "authority": "enforced"
+    },
+    "context_engine.validate.consistency": {
+      "description": "Validate brand consistency, tone adherence, and factual grounding",
+      "authority": "enforced"
+    },
+    "webhook.publish.dispatch": {
+      "description": "Dispatch post payload to Discord/Slack/Telegram webhook",
+      "authority": "enforced"
+    }
+  },
   "version": "2.20.15"
 }

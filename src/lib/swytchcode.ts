@@ -26,6 +26,9 @@ class SwytchcodeAuthority {
     }
 
     const fallbackPaths = [
+      "/usr/local/bin/swytchcode",
+      "/opt/homebrew/bin/swytchcode",
+      path.join(os.homedir(), ".npm-global", "bin", "swytchcode"),
       path.join(
         process.env.APPDATA || "",
         "npm",
@@ -118,6 +121,101 @@ class SwytchcodeAuthority {
       this.writeAuditToDisk(audit);
       throw err;
     }
+  }
+
+  /**
+   * Fetch and extract text content from ANY custom web URL via Swytchcode
+   */
+  public async fetchFromUrl(targetUrl: string) {
+    return this.executeTool(
+      "swytchcode.web.fetch",
+      async () => {
+        const response = await fetch(targetUrl, {
+          headers: { "User-Agent": "TrendForge-Swytchcode/2.0" },
+          signal: AbortSignal.timeout(6000),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${targetUrl}: HTTP ${response.status}`);
+        }
+
+        const html = await response.text();
+        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        const title = titleMatch ? titleMatch[1].trim() : targetUrl;
+
+        // Clean basic HTML tags to extract raw text content
+        const cleanText = html
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+          .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 4000);
+
+        return {
+          url: targetUrl,
+          title,
+          extractedText: cleanText,
+          contentLength: cleanText.length,
+          fetchedAt: new Date().toISOString(),
+        };
+      },
+      { targetUrl }
+    );
+  }
+
+  /**
+   * Fetch trending posts from any Reddit community via Swytchcode
+   */
+  public async fetchReddit(subreddit = "MachineLearning") {
+    return this.executeTool(
+      "swytchcode.reddit.fetch",
+      async () => {
+        const url = `https://www.reddit.com/r/${subreddit}/hot.json?limit=5`;
+        const res = await fetch(url, {
+          headers: { "User-Agent": "TrendForge-Bot/1.0" },
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!res.ok) throw new Error(`Reddit API returned status ${res.status}`);
+        const data = await res.json();
+        const posts = (data.data?.children || []).map((c: any) => ({
+          title: c.data.title,
+          url: `https://reddit.com${c.data.permalink}`,
+          score: c.data.score,
+          author: c.data.author,
+          selftext: (c.data.selftext || "").slice(0, 500),
+        }));
+        return { subreddit, posts };
+      },
+      { subreddit }
+    );
+  }
+
+  /**
+   * Fetch top trending repositories on GitHub via Swytchcode
+   */
+  public async fetchGitHubTrending(topic = "ai") {
+    return this.executeTool(
+      "swytchcode.github.fetch",
+      async () => {
+        const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(topic)}+stars:>100&sort=stars&order=desc&per_page=5`;
+        const res = await fetch(url, {
+          headers: { "User-Agent": "TrendForge-Bot/1.0" },
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!res.ok) throw new Error(`GitHub API returned status ${res.status}`);
+        const data = await res.json();
+        const repos = (data.items || []).map((r: any) => ({
+          name: r.full_name,
+          url: r.html_url,
+          stars: r.stargazers_count,
+          description: r.description || "",
+          language: r.language,
+        }));
+        return { topic, repos };
+      },
+      { topic }
+    );
   }
 
   private writeAuditToDisk(entry: SwytchcodeAuditEntry) {
