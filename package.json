@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@swytchcode/runtime": "^1.1.6",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",

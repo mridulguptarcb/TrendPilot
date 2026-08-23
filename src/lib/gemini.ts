@@ -75,14 +75,14 @@ INSTRUCTIONS:
       const { result } = await swytchcode.executeTool(
         "gemini.generate_content",
         async () => {
-          // Use gemini-1.5-flash or gemini-2.0-flash
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          // Use gemini-2.5-flash (active model on API)
+          const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
           const response = await model.generateContent(prompt);
           const text = response.response.text();
           const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
           return JSON.parse(cleanedText);
         },
-        { topic, audience, tone, chunksCount: ragContext.evidence.length }
+        { topic, audience, tone, chunksCount: ragContext.evidence.length, model: "gemini-2.5-flash" }
       );
 
       return {
@@ -103,7 +103,7 @@ INSTRUCTIONS:
         swytchcodeExecutionId: executionId,
       };
     } catch (err) {
-      console.warn("Gemini generation failed or returned unparseable JSON, generating grounded fallback:", err);
+      console.warn("Gemini API call failed, generating grounded fallback:", err);
     }
   }
 
