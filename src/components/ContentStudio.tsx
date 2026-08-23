@@ -14,8 +14,8 @@ import {
   ShieldCheck,
   Copy,
   Check,
-  CheckCircle2,
-  AlertCircle
+  ExternalLink,
+  Share2
 } from "lucide-react";
 
 interface ContentStudioProps {
@@ -104,6 +104,20 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // 1-Click Free Real Twitter Intent Publishing
+  const handleRealTwitterPublish = () => {
+    const textToTweet = editedTwitterThread[0] || `${content.topic} - Insights & Analysis`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(textToTweet)}`;
+    window.open(tweetUrl, "_blank", "noopener,noreferrer");
+  };
+
+  // 1-Click Free Real LinkedIn Share
+  const handleRealLinkedinPublish = () => {
+    navigator.clipboard.writeText(editedLinkedinPost);
+    const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(editedLinkedinPost)}`;
+    window.open(linkedinUrl, "_blank", "noopener,noreferrer");
+  };
+
   const handleScheduleCurrent = () => {
     let preview = "";
     let full: string | string[] = "";
@@ -146,17 +160,36 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/20 px-3.5 py-2 text-xs text-emerald-400">
-              <ShieldCheck className="h-4 w-4" />
-              <span>Grounding Score: <strong>{content.groundingScore}%</strong></span>
-            </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Free Real Twitter / LinkedIn Direct Buttons */}
+            {activePlatform === "twitter" && (
+              <button
+                onClick={handleRealTwitterPublish}
+                className="flex items-center gap-1.5 rounded-xl border border-sky-500/40 bg-sky-500/20 px-3.5 py-2 text-xs font-semibold text-sky-300 hover:bg-sky-500/30 transition-all shadow-sm"
+              >
+                <Twitter className="h-4 w-4 text-sky-400" />
+                <span>1-Click Post to Twitter (Free)</span>
+                <ExternalLink className="h-3 w-3" />
+              </button>
+            )}
+
+            {activePlatform === "linkedin" && (
+              <button
+                onClick={handleRealLinkedinPublish}
+                className="flex items-center gap-1.5 rounded-xl border border-blue-500/40 bg-blue-500/20 px-3.5 py-2 text-xs font-semibold text-blue-300 hover:bg-blue-500/30 transition-all shadow-sm"
+              >
+                <Linkedin className="h-4 w-4 text-blue-400" />
+                <span>1-Click Post to LinkedIn (Free)</span>
+                <ExternalLink className="h-3 w-3" />
+              </button>
+            )}
+
             <button
               onClick={handleCopy}
               className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-white hover:bg-slate-700 transition-all"
             >
-              {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
-              {copied ? "Copied!" : "Copy Active Draft"}
+              {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-slate-400" />}
+              {copied ? "Copied to Clipboard!" : "Copy Active Draft"}
             </button>
           </div>
         </div>
@@ -389,17 +422,20 @@ export const ContentStudio: React.FC<ContentStudioProps> = ({
             </h4>
 
             <div className="space-y-2">
-              {content.posts[activePlatform === "blog" ? "newsletter" : activePlatform]?.citations?.map(
-                (citation, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-2 rounded-lg bg-emerald-950/20 border border-emerald-500/20 p-2 text-xs text-emerald-300"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                    <span className="truncate">{citation}</span>
-                  </div>
-                )
-              )}
+              {(activePlatform === "twitter"
+                ? content.posts.twitter.citations
+                : activePlatform === "linkedin"
+                ? content.posts.linkedin.citations
+                : content.posts.newsletter.citations
+              )?.map((citation, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded-lg bg-emerald-950/20 border border-emerald-500/20 p-2 text-xs text-emerald-300"
+                >
+                  <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">{citation}</span>
+                </div>
+              ))}
             </div>
 
             <p className="text-[11px] text-slate-400 leading-relaxed pt-2 border-t border-slate-800">

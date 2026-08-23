@@ -1,4 +1,4 @@
-export type PlatformType = "twitter" | "linkedin" | "newsletter" | "blog";
+export type PlatformType = "twitter" | "linkedin" | "newsletter" | "blog" | "discord" | "telegram";
 
 export type PostStatus = "DRAFT" | "SCHEDULED" | "PUBLISHING" | "PUBLISHED" | "FAILED";
 

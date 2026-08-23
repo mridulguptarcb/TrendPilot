@@ -15,7 +15,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { action, post, postId, newStatus } = body;
+    const { action, post, postId, newStatus, webhookUrl, customPlatform } = body;
 
     if (action === "add" && post) {
       const scheduledPost: ScheduledPost = {
@@ -30,6 +30,47 @@ export async function POST(req: NextRequest) {
         success: true,
         data: scheduledPost,
         queue: publishingQueue,
+      });
+    }
+
+    // Real Free Webhook Dispatch (e.g. Discord, Slack, Telegram, Custom Endpoint)
+    if (action === "dispatch_webhook" && webhookUrl && post) {
+      const { result, audit } = await swytchcode.executeTool(
+        "webhook.publish.dispatch",
+        async () => {
+          const payload = {
+            username: "TrendForge Bot",
+            avatar_url: "https://raw.githubusercontent.com/mridulguptarcb/TrendPilot/main/public/icon.png",
+            content: `🚀 **TrendForge Real-Time Grounded Dispatch**\n\n**Topic:** ${post.topic}\n\n${post.contentPreview}\n\n*Verified by TrendForge RAG & Swytchcode*`,
+            embeds: [
+              {
+                title: post.topic,
+                description: Array.isArray(post.fullContent) ? post.fullContent.join("\n\n") : post.fullContent,
+                color: 0xf97316,
+                footer: { text: "TrendForge Autonomous RAG Engine" },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          const res = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (!res.ok) {
+            throw new Error(`Webhook returned status ${res.status}: ${res.statusText}`);
+          }
+          return { success: true, status: res.status };
+        },
+        { webhookUrl: webhookUrl.slice(0, 35) + "...", topic: post.topic }
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: result,
+        audit,
       });
     }
 
@@ -73,10 +114,11 @@ export async function POST(req: NextRequest) {
       { success: false, error: "Invalid action payload" },
       { status: 400 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     console.error("Error in /api/schedule:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to process schedule request" },
+      { success: false, error: errorMsg || "Failed to process schedule request" },
       { status: 500 }
     );
   }
